@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tots al Blitz! — Panell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F6F8; --surface:#FFFFFF; --border:#E5E8EC;
+  --navy:#16325C; --navy-dim:#EAEFF6; --navy-deep:#0F2038;
+  --gold:#B9832E; --gold-dim:#FBF2E1; --gold-bright:#D9A64E;
+  --green:#1F7A4D; --green-dim:#E7F5EE;
+  --red:#B94A3B; --red-dim:#FBEAE7;
+  --grey:#5B6472; --grey-dim:#EEF0F2;
+  --text:#181D27; --text2:#5B6472; --text3:#98A0AC;
+  --radius:12px; --shadow:0 1px 2px rgba(20,24,32,.04), 0 4px 14px rgba(20,24,32,.04);
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+.display{font-family:'Oswald',sans-serif;}
+.mono{font-family:'IBM Plex Mono',monospace; font-variant-numeric:tabular-nums;}
+a{color:inherit;}
+
+/* Sidebar */
+.sidebar{position:fixed; top:0; left:0; bottom:0; width:236px; background:linear-gradient(190deg, var(--navy) 0%, var(--navy-deep) 100%); color:#fff; display:flex; flex-direction:column; padding:22px 14px 16px; z-index:20;}
+.brand{padding:2px 10px 20px; border-bottom:1px solid rgba(255,255,255,.08); margin-bottom:14px;}
+.brand .word{font-family:'Oswald',sans-serif; font-size:19px; letter-spacing:.03em; text-transform:uppercase; line-height:1.15;}
+.brand .season{font-size:11px; color:rgba(255,255,255,.45); margin-top:3px; letter-spacing:.02em;}
+nav.navlist{flex:1; display:flex; flex-direction:column; gap:2px;}
+.nav-item{display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:8px; color:rgba(255,255,255,.62); text-decoration:none; font-size:13.5px; font-weight:500; cursor:pointer; border-left:3px solid transparent; transition:background .12s, color .12s;}
+.nav-item svg{width:16px; height:16px; flex-shrink:0; opacity:.85;}
+.nav-item:hover{background:rgba(255,255,255,.06); color:#fff;}
+.nav-item.active{background:rgba(255,255,255,.1); color:#fff; border-left-color:var(--gold-bright);}
+.nav-divider{height:1px; background:rgba(255,255,255,.08); margin:10px 4px;}
+.sidebar-foot{border-top:1px solid rgba(255,255,255,.08); padding-top:12px; margin-top:10px;}
+.sidebar-foot .label{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:rgba(255,255,255,.4); padding:0 10px 6px;}
+.user-switch{display:flex; gap:4px;}
+.user-switch button{flex:1; border:none; background:rgba(255,255,255,.06); color:rgba(255,255,255,.7); padding:8px 4px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:background .12s;}
+.user-switch button.active{background:var(--gold-bright); color:var(--navy-deep);}
+
+/* Main */
+.main{margin-left:236px; padding:34px 40px 90px; min-height:100vh; max-width:1240px;}
+.section{display:none;}
+.section.active{display:block;}
+.section-head{margin-bottom:22px;}
+.section-head h1{font-size:29px; letter-spacing:.02em; text-transform:uppercase; margin:0;}
+.section-head p{margin:3px 0 0; color:var(--text2); font-size:14px;}
+
+.setup-banner{background:var(--gold-dim); border:1px solid var(--gold); border-radius:var(--radius); padding:16px 18px; margin-bottom:22px; font-size:14px; line-height:1.6;}
+.setup-banner strong{color:var(--gold);}
+.setup-banner code{background:#fff; padding:1px 5px; border-radius:4px; border:1px solid var(--border);}
+
+/* KPIs */
+.kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px;}
+.kpi{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow);}
+.kpi .label{font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--text3); margin-bottom:6px;}
+.kpi .value{font-size:22px; font-weight:600;}
+.kpi.green .value{color:var(--green);} .kpi.red .value{color:var(--red);}
+.kpi.navy .value{color:var(--navy);} .kpi.gold .value{color:var(--gold);}
+.kpi.grey .value{color:var(--text2);}
+
+/* Layout */
+.main-grid{display:grid; grid-template-columns:1fr 320px; gap:18px; align-items:start;}
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow);}
+.panel h3{font-size:12.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text3); margin:0 0 12px;}
+.side-block{margin-bottom:20px;} .side-block:last-child{margin-bottom:0;}
+
+/* Toolbar / filters */
+.toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:14px;}
+.toolbar input[type=text]{flex:1; min-width:160px; border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:14px; outline:none; background:var(--bg);}
+.seg{display:flex; gap:2px; background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:3px;}
+.seg button{border:none; background:transparent; padding:6px 12px; border-radius:999px; font-size:12.5px; font-weight:500; color:var(--text2); cursor:pointer; white-space:nowrap;}
+.seg button.active{background:var(--navy); color:#fff;}
+.chips{display:flex; gap:6px; flex-wrap:wrap;}
+.chip{border:1px solid var(--border); background:var(--bg); padding:6px 12px; border-radius:999px; font-size:12.5px; font-weight:500; color:var(--text2); cursor:pointer; white-space:nowrap;}
+.chip.active{background:var(--navy-dim); border-color:var(--navy); color:var(--navy);}
+select.filter{border:1px solid var(--border); border-radius:999px; padding:6px 12px; font-size:12.5px; background:var(--bg); color:var(--text2);}
+.btn-add{background:var(--navy); color:#fff; border:none; border-radius:8px; padding:9px 16px; font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap; transition:background .12s;}
+.btn-add:hover{background:var(--navy-deep);}
+
+/* List rows */
+.row{display:flex; align-items:center; justify-content:space-between; padding:12px 6px; border-bottom:1px solid var(--border); cursor:pointer; gap:12px; border-radius:8px; transition:background .1s;}
+.row:last-child{border-bottom:none;}
+.row:hover{background:var(--bg);}
+.row .desc{font-weight:500; font-size:14.5px;}
+.row .meta{font-size:12.5px; color:var(--text3); margin-top:3px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+.tag{padding:2px 8px; border-radius:5px; font-size:11.5px; font-weight:500; white-space:nowrap;}
+.tag.grey{background:var(--grey-dim); color:var(--grey);}
+.tag.amber{background:var(--gold-dim); color:var(--gold);}
+.tag.green{background:var(--green-dim); color:var(--green);}
+.tag.red{background:var(--red-dim); color:var(--red);}
+.tag.navy{background:var(--navy-dim); color:var(--navy);}
+.row .right{text-align:right; display:flex; align-items:center; gap:10px; flex-shrink:0;}
+.row .amount{font-size:15px; font-weight:600;}
+.row .status{font-size:11.5px; margin-top:2px;}
+.row .del{border:none; background:none; color:var(--text3); cursor:pointer; font-size:16px; padding:4px;}
+.empty{text-align:center; color:var(--text3); padding:36px 10px; font-size:14px;}
+
+/* Bars */
+.bar-item{margin-bottom:10px;}
+.bar-item .bi-top{display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:4px;}
+.bar-item .bi-top .amt{font-family:'IBM Plex Mono',monospace; color:var(--text2);}
+.bar-track{height:6px; background:var(--bg); border-radius:4px; overflow:hidden;}
+.bar-fill{height:100%; border-radius:4px;}
+.payer-row{display:flex; justify-content:space-between; align-items:center; font-size:13px; padding:6px 0;}
+.pill{font-size:11px; padding:2px 8px; border-radius:999px; font-family:'IBM Plex Mono',monospace;}
+.deadline-row{display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); font-size:13px;}
+.deadline-row:last-child{border-bottom:none;}
+.deadline-row .dot{width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:8px;}
+
+/* Modal */
+.modal-overlay{position:fixed; inset:0; background:rgba(15,32,56,.5); display:none; align-items:center; justify-content:center; z-index:60; padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff; border-radius:16px; width:100%; max-width:460px; padding:22px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 50px rgba(15,32,56,.25);}
+.modal-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+.modal-head h2{font-size:18px; margin:0; text-transform:uppercase; letter-spacing:.03em;}
+.modal-head button{border:none; background:none; font-size:20px; cursor:pointer; color:var(--text3);}
+.field{margin-bottom:12px;}
+.field label{font-size:12px; color:var(--text3); display:block; margin-bottom:4px;}
+.field input, .field select, .field textarea{width:100%; border:1px solid var(--border); border-radius:8px; padding:8px 10px; font-size:14px; outline:none; font-family:inherit; background:var(--bg);}
+.field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.type-toggle{display:flex; gap:2px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:3px;}
+.type-toggle button{flex:1; border:none; background:transparent; padding:8px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; color:var(--text2);}
+.modal-actions{display:flex; justify-content:space-between; align-items:center; margin-top:18px;}
+.btn-text{border:none; background:none; font-size:13.5px; font-weight:600; cursor:pointer; padding:8px 10px;}
+.btn-cancel{color:var(--text2);} .btn-del{color:var(--red);}
+.btn-save{background:var(--navy); color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:13.5px; font-weight:600; cursor:pointer;}
+
+/* Dashboard */
+.hero{background:linear-gradient(120deg, var(--navy) 0%, var(--navy-deep) 100%); border-radius:16px; padding:26px 28px; color:#fff; margin-bottom:22px; position:relative; overflow:hidden;}
+.hero::before{content:''; position:absolute; inset:0; background-image:repeating-linear-gradient(100deg, rgba(255,255,255,.05) 0px, rgba(255,255,255,.05) 1px, transparent 1px, transparent 46px); opacity:.5;}
+.hero-inner{position:relative;}
+.hero h1{font-size:26px; margin:0 0 4px; font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:.02em;}
+.hero p{margin:0; color:rgba(255,255,255,.65); font-size:14px;}
+.dash-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px;}
+.dash-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:17px 18px; box-shadow:var(--shadow); text-decoration:none; color:var(--text); display:block; transition:transform .12s, box-shadow .12s;}
+.dash-card:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(20,24,32,.08);}
+.dash-card .dc-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+.dash-card .dc-icon{width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center;}
+.dash-card .dc-icon svg{width:16px; height:16px;}
+.dash-card .dc-label{font-size:12px; color:var(--text3); text-transform:uppercase; letter-spacing:.04em;}
+.dash-card .dc-value{font-size:20px; font-weight:600; margin-top:2px;}
+.dash-main{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+
+@media (max-width:1050px){
+  .sidebar{width:72px; padding:16px 8px;}
+  .sidebar .brand .word, .sidebar .brand .season, .nav-item span, .sidebar-foot .label{display:none;}
+  .nav-item{justify-content:center;}
+  .user-switch{flex-direction:column;}
+  .main{margin-left:72px;}
+}
+@media (max-width:900px){
+  .kpis{grid-template-columns:repeat(2,1fr);}
+  .main-grid{grid-template-columns:1fr;}
+  .field-row{grid-template-columns:1fr;}
+  .dash-grid{grid-template-columns:1fr 1fr;}
+  .dash-main{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="brand">
+    <div class="word">Tots al Blitz!</div>
+    <div class="season">Panell &middot; Temporada 10</div>
+  </div>
+  <nav class="navlist" id="navlist">
+    <div class="nav-item active" data-sec="inici"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Inici</span></div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" data-sec="finances"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7a6.2 6.2 0 100 10"/><path d="M4 10.3h9M4 13.7h7"/></svg><span>Finances</span></div>
+    <div class="nav-item" data-sec="calendari"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Calendari</span></div>
+    <div class="nav-item" data-sec="xarxes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5v3a2 2 0 002 2h1l3 4.5v-16L6 8.5H5a2 2 0 00-2 2z"/><path d="M13.5 8a4.3 4.3 0 010 8"/><path d="M17 5.3a8 8 0 010 13.4"/></svg><span>Xarxes</span></div>
+    <div class="nav-item" data-sec="guions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13.5h6M9 17.5h6"/></svg><span>Guions</span></div>
+    <div class="nav-item" data-sec="materials"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-4 4-3-3-5 5"/></svg><span>Materials</span></div>
+    <div class="nav-item" data-sec="convidats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.6"/><path d="M16 14.3c2.5.4 4.5 2.6 4.5 5.7"/></svg><span>Convidats</span></div>
+    <div class="nav-item" data-sec="botiga"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12l1 13H5z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg><span>Botiga</span></div>
+  </nav>
+  <div class="sidebar-foot">
+    <div class="label">Ets tu</div>
+    <div class="user-switch" id="userSwitch"></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div id="setupBanner" class="setup-banner" style="display:none;">
+    <strong>Falta connectar Firebase.</strong> Obre aquest fitxer, busca <code>const firebaseConfig</code> a dalt de l'&uacute;ltim &lt;script&gt;, i substitueix els <code>OMPLE_AQUI</code> per la configuraci&oacute; del vostre projecte.
+  </div>
+
+  <!-- INICI -->
+  <section class="section active" id="sec-inici">
+    <div class="hero"><div class="hero-inner">
+      <h1 id="greeting">Bon dia</h1>
+      <p>Aix&ograve; &eacute;s el que passa a Tots al Blitz! ara mateix.</p>
+    </div></div>
+
+    <div class="dash-grid" id="dashGrid"></div>
+
+    <div class="dash-main">
+      <div class="panel">
+        <h3>Pr&ograve;xims 30 dies</h3>
+        <div id="dashUpcoming"></div>
+      </div>
+      <div class="panel">
+        <h3>Terminis d'acreditaci&oacute; oberts</h3>
+        <div id="dashDeadlines"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINANCES -->
+  <section class="section" id="sec-finances">
+    <div class="section-head"><h1 class="display">Finances</h1><p>Despeses i ingressos de la temporada</p></div>
+    <div class="kpis">
+      <div class="kpi green"><div class="label">Ingressos</div><div class="value mono" id="fin-kpiIngressos">&mdash;</div></div>
+      <div class="kpi red"><div class="label">Despeses</div><div class="value mono" id="fin-kpiDespeses">&mdash;</div></div>
+      <div class="kpi navy"><div class="label">Balan&ccedil; net</div><div class="value mono" id="fin-kpiBalanc">&mdash;</div></div>
+      <div class="kpi gold"><div class="label">Pendent</div><div class="value mono" id="fin-kpiPendent">&mdash;</div></div>
+    </div>
+    <div class="main-grid">
+      <div class="panel">
+        <div class="toolbar">
+          <div class="seg" id="fin-tipusFilter">
+            <button data-v="tots" class="active">Tots</button>
+            <button data-v="despesa">Despeses</button>
+            <button data-v="ingres">Ingressos</button>
+          </div>
+          <input type="text" id="fin-search" placeholder="Cerca...">
+          <select class="filter" id="fin-estatFilter"><option value="Tots">Tots els estats</option></select>
+          <button class="btn-add" id="fin-btnAdd">+ Afegir moviment</button>
+        </div>
+        <div class="chips" id="fin-catChips" style="margin-bottom:14px;"></div>
+        <div id="fin-list"></div>
+      </div>
+      <aside>
+        <div class="panel side-block"><h3>Per categoria (despeses)</h3><div id="fin-barsDespeses"></div></div>
+        <div class="panel side-block"><h3>Fonts d'ingr&eacute;s</h3><div id="fin-barsIngressos"></div></div>
+        <div class="panel side-block"><h3>Pendent de reemborsar</h3><div id="fin-payerList"></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- CALENDARI -->
+  <section class="section" id="sec-calendari">
+    <div class="section-head"><h1 class="display">Calendari</h1><p>Programes i acreditacions</p></div>
+    <div class="kpis">
+      <div class="kpi navy"><div class="label">Propers programes</div><div class="value mono" id="cal-kpiPropers">&mdash;</div></div>
+      <div class="kpi gold"><div class="label">Acreditacions pendents</div><div class="value mono" id="cal-kpiAcredPendents">&mdash;</div></div>
+      <div class="kpi red"><div class="label">Terminis &lt; 14 dies</div><div class="value mono" id="cal-kpiUrgents">&mdash;</div></div>
+      <div class="kpi green"><div class="label">Publicats temporada</div><div class="value mono" id="cal-kpiPublicats">&mdash;</div></div>
+    </div>
+    <div class="main-grid">
+      <div class="panel">
+        <div class="toolbar">
+          <div class="seg" id="cal-tipusFilter">
+            <button data-v="tots" class="active">Tots</button>
+            <button data-v="programa">Programes</button>
+            <button data-v="acreditacio">Acreditacions</button>
+          </div>
+          <input type="text" id="cal-search" placeholder="Cerca...">
+          <select class="filter" id="cal-estatFilter"><option value="Tots">Tots els estats</option></select>
+          <button class="btn-add" id="cal-btnAdd">+ Afegir</button>
+        </div>
+        <div id="cal-list"></div>
+      </div>
+      <aside>
+        <div class="panel side-block"><h3>Propers 14 dies</h3><div id="cal-upcoming"></div></div>
+        <div class="panel side-block"><h3>Terminis d'acreditaci&oacute;</h3><div id="cal-deadlines"></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- XARXES -->
+  <section class="section" id="sec-xarxes">
+    <div class="section-head"><h1 class="display">Xarxes</h1><p>Contingut i publicacions</p></div>
+    <div class="kpis">
+      <div class="kpi grey"><div class="label">Idees</div><div class="value mono" id="xar-kpiIdees">&mdash;</div></div>
+      <div class="kpi gold"><div class="label">En producci&oacute;</div><div class="value mono" id="xar-kpiProduccio">&mdash;</div></div>
+      <div class="kpi navy"><div class="label">Programats &lt; 7 dies</div><div class="value mono" id="xar-kpiProgramats">&mdash;</div></div>
+      <div class="kpi green"><div class="label">Publicats aquest mes</div><div class="value mono" id="xar-kpiPublicats">&mdash;</div></div>
+    </div>
+    <div class="main-grid">
+      <div class="panel">
+        <div class="toolbar">
+          <select class="filter" id="xar-plataformaFilter"><option value="Tots">Totes les plataformes</option></select>
+          <input type="text" id="xar-search" placeholder="Cerca...">
+          <select class="filter" id="xar-estatFilter"><option value="Tots">Tots els estats</option></select>
+          <button class="btn-add" id="xar-btnAdd">+ Afegir contingut</button>
+        </div>
+        <div id="xar-list"></div>
+      </div>
+      <aside>
+        <div class="panel side-block"><h3>Per plataforma</h3><div id="xar-bars"></div></div>
+        <div class="panel side-block"><h3>Programats propers</h3><div id="xar-upcoming"></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- GUIONS -->
+  <section class="section" id="sec-guions">
+    <div class="section-head"><h1 class="display">Guions</h1><p>Guions i escaletes</p></div>
+    <div class="kpis">
+      <div class="kpi grey"><div class="label">Esborranys</div><div class="value mono" id="gui-kpiEsborrany">&mdash;</div></div>
+      <div class="kpi gold"><div class="label">En revisi&oacute;</div><div class="value mono" id="gui-kpiRevisio">&mdash;</div></div>
+      <div class="kpi green"><div class="label">Finals</div><div class="value mono" id="gui-kpiFinal">&mdash;</div></div>
+      <div class="kpi navy"><div class="label">Total</div><div class="value mono" id="gui-kpiTotal">&mdash;</div></div>
+    </div>
+    <div class="main-grid">
+      <div class="panel">
+        <div class="toolbar">
+          <select class="filter" id="gui-tipusFilter"><option value="Tots">Tots els tipus</option></select>
+          <input type="text" id="gui-search" placeholder="Cerca...">
+          <select class="filter" id="gui-estatFilter"><option value="Tots">Tots els estats</option></select>
+          <button class="btn-add" id="gui-btnAdd">+ Afegir gui&oacute;</button>
+        </div>
+        <div id="gui-list"></div>
+      </div>
+      <aside>
+        <div class="panel side-block"><h3>Per tipus</h3><div id="gui-bars"></div></div>
+        <div class="panel side-block"><h3>Per responsable</h3><div id="gui-byAuthor"></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- MATERIALS -->
+  <section class="section" id="sec-materials">
+    <div class="section-head"><h1 class="display">Materials</h1><p>Gr&agrave;fics, plantilles i actius</p></div>
+    <div class="kpis">
+      <div class="kpi gold"><div class="label">Pendents</div><div class="value mono" id="mat-kpiPendent">&mdash;</div></div>
+      <div class="kpi green"><div class="label">Fets</div><div class="value mono" id="mat-kpiFet">&mdash;</div></div>
+      <div class="kpi navy"><div class="label">Total</div><div class="value mono" id="mat-kpiTotal">&mdash;</div></div>
+      <div class="kpi grey"><div class="label">Categories actives</div><div class="value mono" id="mat-kpiCats">&mdash;</div></div>
+    </div>
+    <div class="main-grid">
+      <div class="panel">
+        <div class="toolbar">
+          <select class="filter" id="mat-catFilter"><option value="Tots">Totes les categories</option></select>
+          <input type="text" id="mat-search" placeholder="Cerca...">
+          <select class="filter" id="mat-estatFilter"><option value="Tots">Tots els estats</option></select>
+          <button class="btn-add" id="mat-btnAdd">+ Afegir material</button>
+        </div>
+        <div id="mat-list"></div>
+      </div>
+      <aside>
+        <div class="panel side-block"><h3>Per categoria</h3><div id="mat-bars"></div></div>
+        <div class="panel side-block"><h3>Per responsable</h3><div id="mat-byAuthor"></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- CONVIDATS -->
+  <section class="section" id="sec-convidats">
+    <div class="section-head"><h1 class="display">Convidats</h1><p>Contactes i convidats al programa</p></div>
+    <div class="kpis">
+      <div class="kpi grey"><div class="label">Per contactar</div><div class="value mono" id="con-kpiPerContactar">&mdash;</div></div>
+      <div class="kpi gold"><div class="label">Contactats</div><div class="value mono" id="con-kpiContactats">&mdash;</div></div>
+      <div class="kpi navy"><div class="label">Confirmats</div><div class="value mono" id="con-kpiConfirmats">&mdash;</div></div>
+      <div class="kpi green"><div class="label">Publicats</div><div class="value mono" id="con-kpiPublicats">&mdash;</div></div>
+    </div>
+    <div class="main-grid">
+      <div class="panel">
+        <div class="toolbar">
+          <input type="text" id="con-search" placeholder="Cerca...">
+          <select class="filter" id="con-estatFilter"><option value="Tots">Tots els estats</option></select>
+          <button class="btn-add" id="con-btnAdd">+ Afegir convidat</button>
+        </div>
+        <div id="con-list"></div>
+      </div>
+      <aside><div class="panel side-block"><h3>Propers confirmats</h3><div id="con-upcoming"></div></div></aside>
+    </div>
+  </section>
+
+  <!-- BOTIGA -->
+  <section class="section" id="sec-botiga">
+    <div class="section-head"><h1 class="display">Botiga</h1><p>Merch i productes propis</p></div>
+    <div class="kpis">
+      <div class="kpi green"><div class="label">A la venda</div><div class="value mono" id="bot-kpiVenda">&mdash;</div></div>
+      <div class="kpi gold"><div class="label">En producci&oacute;</div><div class="value mono" id="bot-kpiProduccio">&mdash;</div></div>
+      <div class="kpi navy"><div class="label">Marge mitj&agrave; / unitat</div><div class="value mono" id="bot-kpiMarge">&mdash;</div></div>
+      <div class="kpi grey"><div class="label">Total productes</div><div class="value mono" id="bot-kpiTotal">&mdash;</div></div>
+    </div>
+    <div class="main-grid">
+      <div class="panel">
+        <div class="toolbar">
+          <select class="filter" id="bot-catFilter"><option value="Tots">Totes les categories</option></select>
+          <input type="text" id="bot-search" placeholder="Cerca...">
+          <select class="filter" id="bot-estatFilter"><option value="Tots">Tots els estats</option></select>
+          <button class="btn-add" id="bot-btnAdd">+ Afegir producte</button>
+        </div>
+        <div id="bot-list"></div>
+      </div>
+      <aside>
+        <div class="panel side-block"><h3>Per plataforma</h3><div id="bot-bars"></div></div>
+        <div class="panel side-block"><h3>Per categoria</h3><div id="bot-byCat"></div></div>
+      </aside>
+    </div>
+  </section>
+
+</div>
+
+<!-- Shared modal, reused by every module -->
+<div class="modal-overlay" id="modalOverlay">
+  <form class="modal" id="form">
+    <div class="modal-head">
+      <h2 class="display" id="modalTitle">Nou</h2>
+      <button type="button" id="btnClose">&times;</button>
+    </div>
+    <div id="formFields"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn-text btn-del" id="btnDel" style="display:none;">Elimina</button>
+      <div>
+        <button type="button" class="btn-text btn-cancel" id="btnCancel">Cancel&middot;la</button>
+        <button type="submit" class="btn-save">Desa</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "OMPLE_AQUI", authDomain: "OMPLE_AQUI.firebaseapp.com", projectId: "OMPLE_AQUI",
+  storageBucket: "OMPLE_AQUI.appspot.com", messagingSenderId: "OMPLE_AQUI", appId: "OMPLE_AQUI"
+};
+const CONFIGURED = firebaseConfig.apiKey !== "OMPLE_AQUI";
+const PEOPLE = ['Ferran', 'Enric', 'Jesús'];
+let currentUser = localStorage.getItem('tab_user') || PEOPLE[0];
+
+/* ---------- helpers ---------- */
+function fmtMoney(amount, currency='EUR'){ try { return new Intl.NumberFormat('ca-ES', { style:'currency', currency }).format(amount); } catch { return `${amount.toFixed(2)} ${currency}`; } }
+function fmtDate(iso){ if(!iso) return ''; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y.slice(2)}`; }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function daysUntil(iso){ return Math.ceil((new Date(iso) - new Date(todayISO())) / 86400000); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* ---------- nav ---------- */
+function showSection(key){
+  document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === 'sec-'+key));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.sec === key));
+}
+document.getElementById('navlist').addEventListener('click', (e) => {
+  const item = e.target.closest('.nav-item');
+  if (item) showSection(item.dataset.sec);
+});
+function renderUserSwitch(){
+  const el = document.getElementById('userSwitch');
+  el.innerHTML = PEOPLE.map(p => `<button data-p="${p}" class="${p===currentUser?'active':''}">${p.slice(0,3)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { currentUser = b.dataset.p; localStorage.setItem('tab_user', currentUser); renderUserSwitch(); renderDashboard(); });
+}
+renderUserSwitch();
+function greet(){
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Bon dia' : h < 20 ? 'Bona tarda' : 'Bona nit';
+  document.getElementById('greeting').textContent = `${g}, ${currentUser}`;
+}
+greet();
+
+/* ---------- shared modal plumbing ---------- */
+const overlay = document.getElementById('modalOverlay');
+const form = document.getElementById('form');
+const formFields = document.getElementById('formFields');
+let modalModule = null;
+let editingId = null;
+const moduleHandlers = {}; // key -> { buildFields(item), readForm(), collection }
+
+function openModal(moduleKey, item){
+  modalModule = moduleKey;
+  editingId = item ? item.id : null;
+  const h = moduleHandlers[moduleKey];
+  document.getElementById('modalTitle').textContent = item ? h.editTitle : h.newTitle;
+  document.getElementById('btnDel').style.display = item ? 'inline-block' : 'none';
+  formFields.innerHTML = h.buildFields(item);
+  if (h.afterBuild) h.afterBuild(item);
+  overlay.classList.add('open');
+}
+function closeModal(){ overlay.classList.remove('open'); modalModule = null; editingId = null; }
+document.getElementById('btnClose').onclick = closeModal;
+document.getElementById('btnCancel').onclick = closeModal;
+overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!modalModule) return;
+  const h = moduleHandlers[modalModule];
+  const data = h.readForm();
+  if (data === null) return; // validation failed
+  if (!CONFIGURED) { alert('Configura Firebase primer (missatge de dalt).'); return; }
+  try {
+    if (editingId) await updateDoc(doc(db, h.collection, editingId), data);
+    else await addDoc(collection(db, h.collection), { ...data, creat: Date.now() });
+    closeModal();
+  } catch (err) { alert('Error en desar: ' + err.message); }
+});
+document.getElementById('btnDel').onclick = async () => {
+  if (!modalModule || !editingId) return;
+  const h = moduleHandlers[modalModule];
+  try { await deleteDoc(doc(db, h.collection, editingId)); } catch (err) { alert('Error: ' + err.message); }
+  closeModal();
+};
+async function removeDirect(moduleKey, id){
+  if (!CONFIGURED) return;
+  const h = moduleHandlers[moduleKey];
+  try { await deleteDoc(doc(db, h.collection, id)); } catch (err) { alert('Error: ' + err.message); }
+}
+
+/* ================= FINANCES ================= */
+(function(){
+  const EXPENSE_CATS = [{id:'viatges',label:'Viatges'},{id:'allotjament',label:'Allotjament'},{id:'material',label:'Material'},{id:'programari',label:'Programari'},{id:'menjar',label:'Menjar'},{id:'altres',label:'Altres'}];
+  const INCOME_CATS = [{id:'patreon',label:'Patreon'},{id:'youtube',label:'YouTube'},{id:'patrocini',label:'Patrocinadors'},{id:'altres_ing',label:'Altres ingressos'}];
+  const PAYERS = [...PEOPLE, 'Compte comú'];
+  let data = [];
+  let filters = { tipus:'tots', categoria:null, estat:'Tots', search:'' };
+  let formTipus = 'despesa';
+
+  function catsFor(t){ return t==='ingres'?INCOME_CATS:EXPENSE_CATS; }
+  function catLabel(t,id){ return catsFor(t).find(c=>c.id===id)?.label || id; }
+
+  document.getElementById('fin-tipusFilter').addEventListener('click', (e) => {
+    if (e.target.tagName!=='BUTTON') return;
+    filters.tipus = e.target.dataset.v; filters.categoria = null;
+    [...e.currentTarget.children].forEach(b=>b.classList.toggle('active', b===e.target));
+    renderCatChips(); render();
+  });
+  document.getElementById('fin-search').addEventListener('input', e=>{ filters.search=e.target.value; render(); });
+  document.getElementById('fin-estatFilter').addEventListener('change', e=>{ filters.estat=e.target.value; render(); });
+  ['Pendent','Completat'].forEach(s => document.getElementById('fin-estatFilter').innerHTML += `<option>${s}</option>`);
+
+  function renderCatChips(){
+    const el = document.getElementById('fin-catChips');
+    if (filters.tipus==='tots'){ el.innerHTML=''; return; }
+    const cats = catsFor(filters.tipus);
+    el.innerHTML = `<button class="chip ${!filters.categoria?'active':''}" data-c="">Totes</button>` + cats.map(c=>`<button class="chip ${filters.categoria===c.id?'active':''}" data-c="${c.id}">${c.label}</button>`).join('');
+    el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ filters.categoria = b.dataset.c || null; renderCatChips(); render(); });
+  }
+
+  function render(){
+    const filtered = data
+      .filter(x=>filters.tipus==='tots'||x.tipus===filters.tipus)
+      .filter(x=>!filters.categoria||x.categoria===filters.categoria)
+      .filter(x=>filters.estat==='Tots'||x.estat===filters.estat)
+      .filter(x=>!filters.search.trim()||(x.descripcio+' '+(x.notes||'')).toLowerCase().includes(filters.search.toLowerCase()))
+      .sort((a,b)=>b.data.localeCompare(a.data)||b.creat-a.creat);
+    const list = document.getElementById('fin-list');
+    list.innerHTML = filtered.length===0 ? `<div class="empty">Cap moviment amb aquests filtres.</div>` : filtered.map(x=>`
+      <div class="row" data-id="${x.id}">
+        <div><div class="desc">${x.descripcio}</div>
+          <div class="meta">
+            <span class="tag ${x.tipus==='ingres'?'green':'red'}">${x.tipus==='ingres'?'Ingrés':'Despesa'}</span>
+            <span>${fmtDate(x.data)}</span><span>&middot;</span><span>${catLabel(x.tipus,x.categoria)}</span><span>&middot;</span><span>${x.persona}</span>
+          </div></div>
+        <div class="right">
+          <div><div class="amount mono" style="color:${x.tipus==='ingres'?'var(--green)':'var(--red)'}">${x.tipus==='ingres'?'+':'-'}${fmtMoney(x.import,x.moneda)}</div>
+          <div class="status" style="color:${x.estat==='Pendent'?'var(--gold)':'var(--text3)'}">${x.estat}</div></div>
+          <button class="del" data-del="${x.id}">&#10005;</button>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('.row').forEach(r=>r.addEventListener('click', e=>{ if(e.target.closest('.del'))return; openModal('finances', data.find(m=>m.id===r.dataset.id)); }));
+    list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); removeDirect('finances', b.dataset.del); }));
+    renderKPIs(); renderBars(); renderPayers();
+  }
+  function renderKPIs(){
+    const byCur=(t)=>{ const m={}; data.filter(x=>x.tipus===t).forEach(x=>{m[x.moneda]=(m[x.moneda]||0)+x.import;}); return m; };
+    const ing=byCur('ingres'), desp=byCur('despesa');
+    const pend={}; data.filter(x=>x.estat==='Pendent').forEach(x=>{ pend[x.moneda]=(pend[x.moneda]||0)+(x.tipus==='ingres'?x.import:-x.import); });
+    const join=(obj)=>Object.keys(obj).length?Object.entries(obj).map(([c,v])=>fmtMoney(v,c)).join(' · '):fmtMoney(0,'EUR');
+    document.getElementById('fin-kpiIngressos').innerHTML = join(ing);
+    document.getElementById('fin-kpiDespeses').innerHTML = join(desp);
+    const bal={}; new Set([...Object.keys(ing),...Object.keys(desp)]).forEach(c=>bal[c]=(ing[c]||0)-(desp[c]||0));
+    document.getElementById('fin-kpiBalanc').innerHTML = Object.keys(bal).length?Object.entries(bal).map(([c,v])=>fmtMoney(v,c)).join(' · '):fmtMoney(0,'EUR');
+    document.getElementById('fin-kpiPendent').innerHTML = Object.keys(pend).length?Object.entries(pend).map(([c,v])=>fmtMoney(Math.abs(v),c)).join(' · '):fmtMoney(0,'EUR');
+  }
+  function renderBars(){
+    function build(t, elId, color){
+      const sums={}; data.filter(x=>x.tipus===t).forEach(x=>{sums[x.categoria]=(sums[x.categoria]||0)+x.import;});
+      const max=Math.max(1,...Object.values(sums)); const el=document.getElementById(elId); const entries=Object.entries(sums);
+      el.innerHTML = entries.length? entries.sort((a,b)=>b[1]-a[1]).map(([c,v])=>`<div class="bar-item"><div class="bi-top"><span>${catLabel(t,c)}</span><span class="amt">${fmtMoney(v,'EUR')}</span></div><div class="bar-track"><div class="bar-fill" style="width:${(v/max*100).toFixed(0)}%; background:${color};"></div></div></div>`).join('') : `<div class="empty" style="padding:10px 0;">Sense dades.</div>`;
+    }
+    build('despesa','fin-barsDespeses','var(--red)'); build('ingres','fin-barsIngressos','var(--green)');
+  }
+  function renderPayers(){
+    const per={}; data.filter(x=>x.tipus==='despesa'&&x.estat==='Pendent').forEach(x=>{ if(!per[x.persona])per[x.persona]={}; per[x.persona][x.moneda]=(per[x.persona][x.moneda]||0)+x.import; });
+    const el=document.getElementById('fin-payerList'); const entries=Object.entries(per);
+    el.innerHTML = entries.length? entries.map(([p,byCur])=>`<div class="payer-row"><span>${p}</span><span>${Object.entries(byCur).map(([c,v])=>`<span class="pill" style="background:var(--gold-dim); color:var(--gold);">${fmtMoney(v,c)}</span>`).join(' ')}</span></div>`).join('') : `<div class="empty" style="padding:10px 0;">Tot liquidat.</div>`;
+  }
+
+  function buildFields(item){
+    formTipus = item ? item.tipus : 'despesa';
+    const d = item || { data:todayISO(), descripcio:'', categoria:catsFor(formTipus)[0].id, import:'', moneda:'EUR', persona:currentUser, estat:'Pendent', notes:'' };
+    return `
+      <div class="field"><div class="type-toggle" id="fin-typeToggle">
+        <button type="button" data-v="despesa" style="${formTipus==='despesa'?'background:var(--red);color:#fff;':''}">Despesa</button>
+        <button type="button" data-v="ingres" style="${formTipus==='ingres'?'background:var(--green);color:#fff;':''}">Ingrés</button>
+      </div></div>
+      <div class="field"><label>Descripció</label><input type="text" id="fin-fDescripcio" required value="${d.descripcio||''}"></div>
+      <div class="field-row">
+        <div class="field"><label>Import</label><input type="text" id="fin-fImport" inputmode="decimal" required value="${item?item.import:''}"></div>
+        <div class="field"><label>Moneda</label><select id="fin-fMoneda"><option ${d.moneda==='EUR'?'selected':''}>EUR</option><option ${d.moneda==='USD'?'selected':''}>USD</option></select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Data</label><input type="date" id="fin-fData" required value="${d.data}"></div>
+        <div class="field"><label>Categoria</label><select id="fin-fCategoria">${catsFor(formTipus).map(c=>`<option value="${c.id}" ${d.categoria===c.id?'selected':''}>${c.label}</option>`).join('')}</select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label id="fin-personaLabel">${formTipus==='ingres'?'Registrat per':'Pagat per'}</label><select id="fin-fPersona">${PAYERS.map(p=>`<option ${d.persona===p?'selected':''}>${p}</option>`).join('')}</select></div>
+        <div class="field"><label>Estat</label><select id="fin-fEstat"><option ${d.estat==='Pendent'?'selected':''}>Pendent</option><option ${d.estat==='Completat'?'selected':''}>Completat</option></select></div>
+      </div>
+      <div class="field"><label>Notes</label><textarea id="fin-fNotes" rows="2">${d.notes||''}</textarea></div>
+    `;
+  }
+  function afterBuild(item){
+    document.getElementById('fin-typeToggle').addEventListener('click', e=>{
+      if (e.target.tagName!=='BUTTON') return;
+      formTipus = e.target.dataset.v;
+      formFields.innerHTML = buildFields(item && item.tipus===formTipus ? item : { data:document.getElementById('fin-fData')?.value||todayISO(), descripcio:document.getElementById('fin-fDescripcio')?.value||'', persona:currentUser, estat:'Pendent' });
+      afterBuild(item);
+    });
+  }
+  function readForm(){
+    const val = parseFloat(document.getElementById('fin-fImport').value.replace(',','.'));
+    const descripcio = document.getElementById('fin-fDescripcio').value.trim();
+    if (!descripcio || isNaN(val) || val<=0) { alert('Falta descripció o import vàlid.'); return null; }
+    return {
+      tipus: formTipus, descripcio, import: val,
+      moneda: document.getElementById('fin-fMoneda').value,
+      data: document.getElementById('fin-fData').value,
+      categoria: document.getElementById('fin-fCategoria').value,
+      persona: document.getElementById('fin-fPersona').value,
+      estat: document.getElementById('fin-fEstat').value,
+      notes: document.getElementById('fin-fNotes').value.trim(),
+    };
+  }
+  document.getElementById('fin-btnAdd').onclick = () => openModal('finances', null);
+  moduleHandlers.finances = { collection:'moviments', newTitle:'Nou moviment', editTitle:'Edita moviment', buildFields, afterBuild, readForm };
+  renderCatChips();
+  window.__finRender = render; window.__finSetData = (d) => { data = d; render(); };
+})();
+
+/* ================= CALENDARI ================= */
+(function(){
+  const PROGRAM_CATS=[{id:'setmanal',label:'Setmanal'},{id:'playoffs',label:'Playoffs'},{id:'superbowl',label:'Super Bowl'},{id:'draft',label:'Draft'},{id:'especial',label:'Especial'}];
+  const CRED_CATS=[{id:'equip_nfl',label:'Equip NFL'},{id:'draft',label:'Draft'},{id:'superbowl',label:'Super Bowl'},{id:'altres',label:'Altres'}];
+  const ESTATS_PROGRAMA=['Planificat','Gravat','Publicat'];
+  const ESTATS_CRED=["Pendent d'enviar",'Enviada','Aprovada','Denegada'];
+  let data=[]; let filters={tipus:'tots',estat:'Tots',search:''}; let formTipus='programa';
+
+  function catsFor(t){ return t==='acreditacio'?CRED_CATS:PROGRAM_CATS; }
+  function estatsFor(t){ return t==='acreditacio'?ESTATS_CRED:ESTATS_PROGRAMA; }
+  function catLabel(t,id){ return catsFor(t).find(c=>c.id===id)?.label||id; }
+  function estatTag(t,e){ if(t==='acreditacio') return {"Pendent d'enviar":'amber','Enviada':'navy','Aprovada':'green','Denegada':'red'}[e]||'grey'; return {'Planificat':'grey','Gravat':'amber','Publicat':'green'}[e]||'grey'; }
+
+  document.getElementById('cal-tipusFilter').addEventListener('click', e=>{
+    if(e.target.tagName!=='BUTTON')return;
+    filters.tipus=e.target.dataset.v;
+    [...e.currentTarget.children].forEach(b=>b.classList.toggle('active',b===e.target));
+    populateEstatFilter(); render();
+  });
+  document.getElementById('cal-search').addEventListener('input', e=>{filters.search=e.target.value; render();});
+  document.getElementById('cal-estatFilter').addEventListener('change', e=>{filters.estat=e.target.value; render();});
+  function populateEstatFilter(){
+    const el=document.getElementById('cal-estatFilter');
+    const all = filters.tipus==='tots'? [...new Set([...ESTATS_PROGRAMA,...ESTATS_CRED])] : estatsFor(filters.tipus);
+    el.innerHTML = `<option value="Tots">Tots els estats</option>` + all.map(s=>`<option>${s}</option>`).join('');
+    filters.estat='Tots';
+  }
+  populateEstatFilter();
+
+  function render(){
+    const filtered = data
+      .filter(x=>filters.tipus==='tots'||x.tipus===filters.tipus)
+      .filter(x=>filters.estat==='Tots'||x.estat===filters.estat)
+      .filter(x=>!filters.search.trim()||(x.titol+' '+(x.notes||'')).toLowerCase().includes(filters.search.toLowerCase()))
+      .sort((a,b)=>a.data.localeCompare(b.data));
+    const list=document.getElementById('cal-list');
+    list.innerHTML = filtered.length===0? `<div class="empty">Cap element amb aquests filtres.</div>` : filtered.map(x=>`
+      <div class="row" data-id="${x.id}">
+        <div><div class="desc">${x.titol}</div>
+          <div class="meta"><span class="tag ${x.tipus==='programa'?'navy':'amber'}">${x.tipus==='programa'?'Programa':'Acreditació'}</span>
+          <span>${fmtDate(x.data)}${x.hora?' · '+x.hora:''}</span><span>&middot;</span><span>${catLabel(x.tipus,x.categoria)}</span></div></div>
+        <div class="right"><span class="tag ${estatTag(x.tipus,x.estat)}">${x.estat}</span><button class="del" data-del="${x.id}">&#10005;</button></div>
+      </div>`).join('');
+    list.querySelectorAll('.row').forEach(r=>r.addEventListener('click', e=>{ if(e.target.closest('.del'))return; openModal('calendari', data.find(m=>m.id===r.dataset.id)); }));
+    list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); removeDirect('calendari', b.dataset.del); }));
+    renderKPIs(); renderUpcoming(); renderDeadlines();
+  }
+  function renderKPIs(){
+    const today=todayISO();
+    document.getElementById('cal-kpiPropers').textContent = data.filter(x=>x.tipus==='programa'&&x.data>=today).length;
+    document.getElementById('cal-kpiAcredPendents').textContent = data.filter(x=>x.tipus==='acreditacio'&&x.estat==="Pendent d'enviar").length;
+    document.getElementById('cal-kpiUrgents').textContent = data.filter(x=>x.tipus==='acreditacio'&&x.estat!=='Denegada'&&daysUntil(x.data)>=0&&daysUntil(x.data)<=14).length;
+    document.getElementById('cal-kpiPublicats').textContent = data.filter(x=>x.tipus==='programa'&&x.estat==='Publicat').length;
+  }
+  function renderUpcoming(){
+    const today=todayISO();
+    const up=data.filter(x=>x.data>=today&&daysUntil(x.data)<=14).sort((a,b)=>a.data.localeCompare(b.data));
+    document.getElementById('cal-upcoming').innerHTML = up.length? up.map(x=>`<div class="deadline-row"><span>${x.titol}</span><span class="mono" style="color:var(--text2)">${fmtDate(x.data)}</span></div>`).join('') : `<div class="empty" style="padding:10px 0;">Res en els propers 14 dies.</div>`;
+  }
+  function renderDeadlines(){
+    const cred=data.filter(x=>x.tipus==='acreditacio'&&x.estat!=='Aprovada'&&x.estat!=='Denegada').sort((a,b)=>a.data.localeCompare(b.data));
+    document.getElementById('cal-deadlines').innerHTML = cred.length? cred.map(x=>{ const d=daysUntil(x.data); const color=d<0?'var(--red)':d<=7?'var(--red)':d<=21?'var(--gold)':'var(--grey)'; return `<div class="deadline-row"><span><span class="dot" style="background:${color}"></span>${x.titol}</span><span class="mono" style="color:${color}">${d<0?'vençut':d+'d'}</span></div>`; }).join('') : `<div class="empty" style="padding:10px 0;">Cap termini obert.</div>`;
+  }
+
+  function buildFields(item){
+    formTipus = item ? item.tipus : 'programa';
+    const d = item || { titol:'', data:todayISO(), hora:'', categoria:catsFor(formTipus)[0].id, estat:estatsFor(formTipus)[0], enllac:'', notes:'' };
+    return `
+      <div class="field"><div class="type-toggle" id="cal-typeToggle">
+        <button type="button" data-v="programa" style="${formTipus==='programa'?'background:var(--navy);color:#fff;':''}">Programa</button>
+        <button type="button" data-v="acreditacio" style="${formTipus==='acreditacio'?'background:var(--gold);color:#fff;':''}">Acreditació</button>
+      </div></div>
+      <div class="field"><label>${formTipus==='acreditacio'?'Equip / esdeveniment':'Títol del programa'}</label><input type="text" id="cal-fTitol" required value="${d.titol||''}"></div>
+      <div class="field-row">
+        <div class="field"><label>${formTipus==='acreditacio'?'Data límit':'Data'}</label><input type="date" id="cal-fData" required value="${d.data}"></div>
+        ${formTipus==='programa' ? `<div class="field"><label>Hora</label><input type="time" id="cal-fHora" value="${d.hora||''}"></div>` : `<div></div>`}
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Categoria</label><select id="cal-fCategoria">${catsFor(formTipus).map(c=>`<option value="${c.id}" ${d.categoria===c.id?'selected':''}>${c.label}</option>`).join('')}</select></div>
+        <div class="field"><label>Estat</label><select id="cal-fEstat">${estatsFor(formTipus).map(s=>`<option ${d.estat===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      </div>
+      ${formTipus==='acreditacio' ? `<div class="field"><label>Enllaç</label><input type="text" id="cal-fEnllac" value="${d.enllac||''}"></div>` : ''}
+      <div class="field"><label>Notes</label><textarea id="cal-fNotes" rows="2">${d.notes||''}</textarea></div>
+    `;
+  }
+  function afterBuild(item){
+    document.getElementById('cal-typeToggle').addEventListener('click', e=>{
+      if(e.target.tagName!=='BUTTON')return;
+      formTipus=e.target.dataset.v;
+      formFields.innerHTML = buildFields(item && item.tipus===formTipus ? item : { titol:document.getElementById('cal-fTitol')?.value||'', data:document.getElementById('cal-fData')?.value||todayISO() });
+      afterBuild(item);
+    });
+  }
+  function readForm(){
+    const titol = document.getElementById('cal-fTitol').value.trim();
+    if (!titol) { alert('Falta el títol.'); return null; }
+    return {
+      tipus: formTipus, titol,
+      data: document.getElementById('cal-fData').value,
+      hora: document.getElementById('cal-fHora') ? document.getElementById('cal-fHora').value : '',
+      categoria: document.getElementById('cal-fCategoria').value,
+      estat: document.getElementById('cal-fEstat').value,
+      enllac: document.getElementById('cal-fEnllac') ? document.getElementById('cal-fEnllac').value.trim() : '',
+      notes: document.getElementById('cal-fNotes').value.trim(),
+    };
+  }
+  document.getElementById('cal-btnAdd').onclick = () => openModal('calendari', null);
+  moduleHandlers.calendari = { collection:'calendari_items', newTitle:'Nou element', editTitle:'Edita element', buildFields, afterBuild, readForm };
+  window.__calSetData = (d) => { data = d; render(); };
+})();
+
+/* ================= XARXES ================= */
+(function(){
+  const PLATFORMS=['Instagram','TikTok','YouTube','Bluesky','Substack'];
+  const FORMATS=['Reel','Post','Story','Article','Short','Directe'];
+  const ESTATS=['Idea','En producció','Programat','Publicat'];
+  let data=[]; let filters={plataforma:'Tots',estat:'Tots',search:''};
+  function estatTag(e){ return {'Idea':'grey','En producció':'amber','Programat':'navy','Publicat':'green'}[e]||'grey'; }
+
+  document.getElementById('xar-plataformaFilter').innerHTML += PLATFORMS.map(p=>`<option>${p}</option>`).join('');
+  document.getElementById('xar-estatFilter').innerHTML += ESTATS.map(s=>`<option>${s}</option>`).join('');
+  document.getElementById('xar-plataformaFilter').addEventListener('change', e=>{filters.plataforma=e.target.value; render();});
+  document.getElementById('xar-estatFilter').addEventListener('change', e=>{filters.estat=e.target.value; render();});
+  document.getElementById('xar-search').addEventListener('input', e=>{filters.search=e.target.value; render();});
+
+  function render(){
+    const filtered = data.filter(x=>filters.plataforma==='Tots'||x.plataforma===filters.plataforma)
+      .filter(x=>filters.estat==='Tots'||x.estat===filters.estat)
+      .filter(x=>!filters.search.trim()||(x.titol+' '+(x.notes||'')).toLowerCase().includes(filters.search.toLowerCase()))
+      .sort((a,b)=>b.data.localeCompare(a.data));
+    const list=document.getElementById('xar-list');
+    list.innerHTML = filtered.length===0? `<div class="empty">Cap contingut amb aquests filtres.</div>` : filtered.map(x=>`
+      <div class="row" data-id="${x.id}"><div><div class="desc">${x.titol}</div>
+        <div class="meta"><span class="tag navy">${x.plataforma}</span><span>${x.format}</span><span>&middot;</span><span>${fmtDate(x.data)}</span></div></div>
+      <div class="right"><span class="tag ${estatTag(x.estat)}">${x.estat}</span><button class="del" data-del="${x.id}">&#10005;</button></div></div>`).join('');
+    list.querySelectorAll('.row').forEach(r=>r.addEventListener('click', e=>{ if(e.target.closest('.del'))return; openModal('xarxes', data.find(m=>m.id===r.dataset.id)); }));
+    list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); removeDirect('xarxes', b.dataset.del); }));
+    renderKPIs(); renderBars(); renderUpcoming();
+  }
+  function renderKPIs(){
+    const today=todayISO(); const thisMonth=today.slice(0,7);
+    document.getElementById('xar-kpiIdees').textContent = data.filter(x=>x.estat==='Idea').length;
+    document.getElementById('xar-kpiProduccio').textContent = data.filter(x=>x.estat==='En producció').length;
+    document.getElementById('xar-kpiProgramats').textContent = data.filter(x=>x.estat==='Programat'&&x.data>=today&&daysUntil(x.data)<=7).length;
+    document.getElementById('xar-kpiPublicats').textContent = data.filter(x=>x.estat==='Publicat'&&x.data.slice(0,7)===thisMonth).length;
+  }
+  function renderBars(){
+    const sums={}; data.forEach(x=>{sums[x.plataforma]=(sums[x.plataforma]||0)+1;});
+    const max=Math.max(1,...Object.values(sums)); const entries=Object.entries(sums);
+    document.getElementById('xar-bars').innerHTML = entries.length? entries.sort((a,b)=>b[1]-a[1]).map(([p,v])=>`<div class="bar-item"><div class="bi-top"><span>${p}</span><span class="amt">${v}</span></div><div class="bar-track"><div class="bar-fill" style="width:${(v/max*100).toFixed(0)}%; background:var(--navy);"></div></div></div>`).join('') : `<div class="empty" style="padding:10px 0;">Sense dades.</div>`;
+  }
+  function renderUpcoming(){
+    const today=todayISO();
+    const up=data.filter(x=>x.estat==='Programat'&&x.data>=today).sort((a,b)=>a.data.localeCompare(b.data)).slice(0,8);
+    document.getElementById('xar-upcoming').innerHTML = up.length? up.map(x=>`<div class="deadline-row"><span>${x.titol}</span><span class="mono" style="color:var(--text2)">${fmtDate(x.data)}</span></div>`).join('') : `<div class="empty" style="padding:10px 0;">Res programat.</div>`;
+  }
+  function buildFields(item){
+    const d = item || { titol:'', plataforma:PLATFORMS[0], format:FORMATS[0], data:todayISO(), estat:ESTATS[0], enllac:'', notes:'' };
+    return `
+      <div class="field"><label>Títol / idea</label><input type="text" id="xar-fTitol" required value="${d.titol||''}"></div>
+      <div class="field-row">
+        <div class="field"><label>Plataforma</label><select id="xar-fPlataforma">${PLATFORMS.map(p=>`<option ${d.plataforma===p?'selected':''}>${p}</option>`).join('')}</select></div>
+        <div class="field"><label>Format</label><select id="xar-fFormat">${FORMATS.map(f=>`<option ${d.format===f?'selected':''}>${f}</option>`).join('')}</select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Data de publicació</label><input type="date" id="xar-fData" required value="${d.data}"></div>
+        <div class="field"><label>Estat</label><select id="xar-fEstat">${ESTATS.map(s=>`<option ${d.estat===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>Enllaç</label><input type="text" id="xar-fEnllac" value="${d.enllac||''}"></div>
+      <div class="field"><label>Notes</label><textarea id="xar-fNotes" rows="2">${d.notes||''}</textarea></div>
+    `;
+  }
+  function readForm(){
+    const titol = document.getElementById('xar-fTitol').value.trim();
+    if (!titol) { alert('Falta el títol.'); return null; }
+    return { titol, plataforma:document.getElementById('xar-fPlataforma').value, format:document.getElementById('xar-fFormat').value, data:document.getElementById('xar-fData').value, estat:document.getElementById('xar-fEstat').value, enllac:document.getElementById('xar-fEnllac').value.trim(), notes:document.getElementById('xar-fNotes').value.trim() };
+  }
+  document.getElementById('xar-btnAdd').onclick = () => openModal('xarxes', null);
+  moduleHandlers.xarxes = { collection:'xarxes_items', newTitle:'Nou contingut', editTitle:'Edita contingut', buildFields, readForm };
+  window.__xarSetData = (d) => { data = d; render(); };
+})();
+
+/* ================= GUIONS ================= */
+(function(){
+  const TIPUS=['Programa setmanal','Promo','Especial']; const ESTATS=['Esborrany','Revisió','Final'];
+  let data=[]; let filters={tipus:'Tots',estat:'Tots',search:''};
+  function estatTag(e){ return {'Esborrany':'grey','Revisió':'amber','Final':'green'}[e]||'grey'; }
+  document.getElementById('gui-tipusFilter').innerHTML += TIPUS.map(t=>`<option>${t}</option>`).join('');
+  document.getElementById('gui-estatFilter').innerHTML += ESTATS.map(s=>`<option>${s}</option>`).join('');
+  document.getElementById('gui-tipusFilter').addEventListener('change', e=>{filters.tipus=e.target.value; render();});
+  document.getElementById('gui-estatFilter').addEventListener('change', e=>{filters.estat=e.target.value; render();});
+  document.getElementById('gui-search').addEventListener('input', e=>{filters.search=e.target.value; render();});
+
+  function render(){
+    const filtered = data.filter(x=>filters.tipus==='Tots'||x.tipus===filters.tipus)
+      .filter(x=>filters.estat==='Tots'||x.estat===filters.estat)
+      .filter(x=>!filters.search.trim()||(x.titol+' '+(x.notes||'')).toLowerCase().includes(filters.search.toLowerCase()))
+      .sort((a,b)=>b.data.localeCompare(a.data));
+    const list=document.getElementById('gui-list');
+    list.innerHTML = filtered.length===0? `<div class="empty">Cap guió amb aquests filtres.</div>` : filtered.map(x=>`
+      <div class="row" data-id="${x.id}"><div><div class="desc">${x.titol}</div>
+        <div class="meta"><span class="tag navy">${x.tipus}</span><span>${fmtDate(x.data)}</span><span>&middot;</span><span>${x.responsable}</span>${x.enllac?`<span>&middot;</span><a href="${x.enllac}" target="_blank" style="color:var(--navy)" onclick="event.stopPropagation()">document</a>`:''}</div></div>
+      <div class="right"><span class="tag ${estatTag(x.estat)}">${x.estat}</span><button class="del" data-del="${x.id}">&#10005;</button></div></div>`).join('');
+    list.querySelectorAll('.row').forEach(r=>r.addEventListener('click', e=>{ if(e.target.closest('.del')||e.target.tagName==='A')return; openModal('guions', data.find(m=>m.id===r.dataset.id)); }));
+    list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); removeDirect('guions', b.dataset.del); }));
+    renderKPIs(); renderBars(); renderByAuthor();
+  }
+  function renderKPIs(){
+    document.getElementById('gui-kpiEsborrany').textContent = data.filter(x=>x.estat==='Esborrany').length;
+    document.getElementById('gui-kpiRevisio').textContent = data.filter(x=>x.estat==='Revisió').length;
+    document.getElementById('gui-kpiFinal').textContent = data.filter(x=>x.estat==='Final').length;
+    document.getElementById('gui-kpiTotal').textContent = data.length;
+  }
+  function renderBars(){
+    const sums={}; data.forEach(x=>{sums[x.tipus]=(sums[x.tipus]||0)+1;});
+    const max=Math.max(1,...Object.values(sums)); const entries=Object.entries(sums);
+    document.getElementById('gui-bars').innerHTML = entries.length? entries.sort((a,b)=>b[1]-a[1]).map(([t,v])=>`<div class="bar-item"><div class="bi-top"><span>${t}</span><span class="amt">${v}</span></div><div class="bar-track"><div class="bar-fill" style="width:${(v/max*100).toFixed(0)}%; background:var(--navy);"></div></div></div>`).join('') : `<div class="empty" style="padding:10px 0;">Sense dades.</div>`;
+  }
+  function renderByAuthor(){
+    const sums={}; data.forEach(x=>{sums[x.responsable]=(sums[x.responsable]||0)+1;});
+    const entries=Object.entries(sums);
+    document.getElementById('gui-byAuthor').innerHTML = entries.length? entries.map(([p,v])=>`<div class="payer-row"><span>${p}</span><span class="pill" style="background:var(--navy-dim); color:var(--navy);">${v}</span></div>`).join('') : `<div class="empty" style="padding:10px 0;">Sense dades.</div>`;
+  }
+  function buildFields(item){
+    const d = item || { titol:'', tipus:TIPUS[0], data:todayISO(), responsable:currentUser, estat:ESTATS[0], enllac:'', notes:'' };
+    return `
+      <div class="field"><label>Títol / capítol</label><input type="text" id="gui-fTitol" required value="${d.titol||''}"></div>
+      <div class="field-row">
+        <div class="field"><label>Tipus</label><select id="gui-fTipus">${TIPUS.map(t=>`<option ${d.tipus===t?'selected':''}>${t}</option>`).join('')}</select></div>
+        <div class="field"><label>Data</label><input type="date" id="gui-fData" required value="${d.data}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Responsable</label><select id="gui-fResponsable">${PEOPLE.map(p=>`<option ${d.responsable===p?'selected':''}>${p}</option>`).join('')}</select></div>
+        <div class="field"><label>Estat</label><select id="gui-fEstat">${ESTATS.map(s=>`<option ${d.estat===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      </div>
+      <div class="field"><label>Enllaç al document</label><input type="text" id="gui-fEnllac" value="${d.enllac||''}"></div>
+      <div class="field"><label>Notes</label><textarea id="gui-fNotes" rows="2">${d.notes||''}</textarea></div>
+    `;
+  }
+  function readForm(){
+    const titol = document.getElementById('gui-fTitol').value.trim();
+    if (!titol) { alert('Falta el títol.'); return null; }
+    return { titol, tipus:document.getElementById('gui-fTipus').value, data:document.getElementById('gui-fData').value, responsable:document.getElementById('gui-fResponsable').value, estat:document.getElementById('gui-fEstat').value, enllac:document.getElementById('gui-fEnllac').value.trim(), notes:document.getElementById('gui-fNotes').value.trim() };
+  }
+  document.getElementById('gui-btnAdd').onclick = () => openModal('guions', null);
+  moduleHandlers.guions = { collection:'guions_items', newTitle:'Nou guió', editTitle:'Edita guió', buildFields, readForm };
+  window.__guiSetData = (d) => { data = d; render(); };
+})();
+
+/* ================= MATERIALS ================= */
+(function(){
+  const CATS=['Gràfics','Vídeo','Àudio','Plantilla','Altres'];
+  let data=[]; let filters={categoria:'Tots',estat:'Tots',search:''};
+  document.getElementById('mat-catFilter').innerHTML += CATS.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('mat-estatFilter').innerHTML += ['Pendent','Fet'].map(s=>`<option>${s}</option>`).join('');
+  document.getElementById('mat-catFilter').addEventListener('change', e=>{filters.categoria=e.target.value; render();});
+  document.getElementById('mat-estatFilter').addEventListener('change', e=>{filters.estat=e.target.value; render();});
+  document.getElementById('mat-search').addEventListener('input', e=>{filters.search=e.target.value; render();});
+
+  function render(){
+    const filtered = data.filter(x=>filters.categoria==='Tots'||x.categoria===filters.categoria)
+      .filter(x=>filters.estat==='Tots'||x.estat===filters.estat)
+      .filter(x=>!filters.search.trim()||(x.nom+' '+(x.notes||'')).toLowerCase().includes(filters.search.toLowerCase()))
+      .sort((a,b)=>(b.creat||0)-(a.creat||0));
+    const list=document.getElementById('mat-list');
+    list.innerHTML = filtered.length===0? `<div class="empty">Cap material amb aquests filtres.</div>` : filtered.map(x=>`
+      <div class="row" data-id="${x.id}"><div><div class="desc">${x.nom}</div>
+        <div class="meta"><span class="tag navy">${x.categoria}</span><span>${x.responsable}</span>${x.data?`<span>&middot;</span><span>${fmtDate(x.data)}</span>`:''}${x.enllac?`<span>&middot;</span><a href="${x.enllac}" target="_blank" style="color:var(--navy)" onclick="event.stopPropagation()">obre</a>`:''}</div></div>
+      <div class="right"><span class="tag ${x.estat==='Fet'?'green':'amber'}">${x.estat}</span><button class="del" data-del="${x.id}">&#10005;</button></div></div>`).join('');
+    list.querySelectorAll('.row').forEach(r=>r.addEventListener('click', e=>{ if(e.target.closest('.del')||e.target.tagName==='A')return; openModal('materials', data.find(m=>m.id===r.dataset.id)); }));
+    list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); removeDirect('materials', b.dataset.del); }));
+    renderKPIs(); renderBars(); renderByAuthor();
+  }
+  function renderKPIs(){
+    document.getElementById('mat-kpiPendent').textContent = data.filter(x=>x.estat==='Pendent').length;
+    document.getElementById('mat-kpiFet').textContent = data.filter(x=>x.estat==='Fet').length;
+    document.getElementById('mat-kpiTotal').textContent = data.length;
+    document.getElementById('mat-kpiCats').textContent = new Set(data.map(x=>x.categoria)).size;
+  }
+  function renderBars(){
+    const sums={}; data.forEach(x=>{sums[x.categoria]=(sums[x.categoria]||0)+1;});
+    const max=Math.max(1,...Object.values(sums)); const entries=Object.entries(sums);
+    document.getElementById('mat-bars').innerHTML = entries.length? entries.sort((a,b)=>b[1]-a[1]).map(([c,v])=>`<div class="bar-item"><div class="bi-top"><span>${c}</span><span class="amt">${v}</span></div><div class="bar-track"><div class="bar-fill" style="width:${(v/max*100).toFixed(0)}%; background:var(--navy);"></div></div></div>`).join('') : `<div class="empty" style="padding:10px 0;">Sense dades.</div>`;
+  }
+  function renderByAuthor(){
+    const sums={}; data.forEach(x=>{sums[x.responsable]=(sums[x.responsable]||0)+1;});
+    const entries=Object.entries(sums);
+    document.getElementById('mat-byAuthor').innerHTML = entries.length? entries.map(([p,v])=>`<div class="payer-row"><span>${p}</span><span class="pill" style="background:var(--navy-dim); color:var(--navy);">${v}</span></div>`).join('') : `<div class="empty" style="padding:10px 0;">Sense dades.</div>`;
+  }
+  function buildFields(item){
+    const d = item || { nom:'', categoria:CATS[0], responsable:currentUser, estat:'Pendent', data:todayISO(), enllac:'', notes:'' };
+    return `
+      <div class="field"><label>Nom</label><input type="text" id="mat-fNom" required value="${d.nom||''}"></div>
+      <div class="field-row">
+        <div class="field"><label>Categoria</label><select id="mat-fCategoria">${CATS.map(c=>`<option ${d.categoria===c?'selected':''}>${c}</option>`).join('')}</select></div>
+        <div class="field"><label>Responsable</label><select id="mat-fResponsable">${PEOPLE.map(p=>`<option ${d.responsable===p?'selected':''}>${p}</option>`).join('')}</select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Estat</label><select id="mat-fEstat"><option ${d.estat==='Pendent'?'selected':''}>Pendent</option><option ${d.estat==='Fet'?'selected':''}>Fet</option></select></div>
+        <div class="field"><label>Data</label><input type="date" id="mat-fData" value="${d.data||''}"></div>
+      </div>
+      <div class="field"><label>Enllaç</label><input type="text" id="mat-fEnllac" value="${d.enllac||''}"></div>
+      <div class="field"><label>Notes</label><textarea id="mat-fNotes" rows="2">${d.notes||''}</textarea></div>
+    `;
+  }
+  function readForm(){
+    const nom = document.getElementById('mat-fNom').value.trim();
+    if (!nom) { alert('Falta el nom.'); return null; }
+    return { nom, categoria:document.getElementById('mat-fCategoria').value, responsable:document.getElementById('mat-fResponsable').value, estat:document.getElementById('mat-fEstat').value, data:document.getElementById('mat-fData').value, enllac:document.getElementById('mat-fEnllac').value.trim(), notes:document.getElementById('mat-fNotes').value.trim() };
+  }
+  document.getElementById('mat-btnAdd').onclick = () => openModal('materials', null);
+  moduleHandlers.materials = { collection:'materials_items', newTitle:'Nou material', editTitle:'Edita material', buildFields, readForm };
+  window.__matSetData = (d) => { data = d; render(); };
+})();
+
+/* ================= CONVIDATS ================= */
+(function(){
+  const ESTATS=['Per contactar','Contactat','Confirmat','Gravat','Publicat'];
+  let data=[]; let filters={estat:'Tots',search:''};
+  function estatTag(e){ return {'Per contactar':'grey','Contactat':'amber','Confirmat':'navy','Gravat':'navy','Publicat':'green'}[e]||'grey'; }
+  document.getElementById('con-estatFilter').innerHTML += ESTATS.map(s=>`<option>${s}</option>`).join('');
+  document.getElementById('con-estatFilter').addEventListener('change', e=>{filters.estat=e.target.value; render();});
+  document.getElementById('con-search').addEventListener('input', e=>{filters.search=e.target.value; render();});
+
+  function render(){
+    const filtered = data.filter(x=>filters.estat==='Tots'||x.estat===filters.estat)
+      .filter(x=>!filters.search.trim()||(x.nom+' '+(x.rol||'')+' '+(x.notes||'')).toLowerCase().includes(filters.search.toLowerCase()))
+      .sort((a,b)=>(b.creat||0)-(a.creat||0));
+    const list=document.getElementById('con-list');
+    list.innerHTML = filtered.length===0? `<div class="empty">Cap convidat amb aquests filtres.</div>` : filtered.map(x=>`
+      <div class="row" data-id="${x.id}"><div><div class="desc">${x.nom}</div>
+        <div class="meta">${x.rol?`<span>${x.rol}</span><span>&middot;</span>`:''}${x.data?`<span>${fmtDate(x.data)}</span>`:'<span>Sense data</span>'}</div></div>
+      <div class="right"><span class="tag ${estatTag(x.estat)}">${x.estat}</span><button class="del" data-del="${x.id}">&#10005;</button></div></div>`).join('');
+    list.querySelectorAll('.row').forEach(r=>r.addEventListener('click', e=>{ if(e.target.closest('.del'))return; openModal('convidats', data.find(m=>m.id===r.dataset.id)); }));
+    list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); removeDirect('convidats', b.dataset.del); }));
+    renderKPIs(); renderUpcoming();
+  }
+  function renderKPIs(){
+    document.getElementById('con-kpiPerContactar').textContent = data.filter(x=>x.estat==='Per contactar').length;
+    document.getElementById('con-kpiContactats').textContent = data.filter(x=>x.estat==='Contactat').length;
+    document.getElementById('con-kpiConfirmats').textContent = data.filter(x=>x.estat==='Confirmat').length;
+    document.getElementById('con-kpiPublicats').textContent = data.filter(x=>x.estat==='Publicat').length;
+  }
+  function renderUpcoming(){
+    const today=todayISO();
+    const up=data.filter(x=>(x.estat==='Confirmat'||x.estat==='Gravat')&&x.data&&x.data>=today).sort((a,b)=>a.data.localeCompare(b.data));
+    document.getElementById('con-upcoming').innerHTML = up.length? up.map(x=>`<div class="deadline-row"><span>${x.nom}</span><span class="mono" style="color:var(--text2)">${fmtDate(x.data)}</span></div>`).join('') : `<div class="empty" style="padding:10px 0;">Cap confirmat amb data.</div>`;
+  }
+  function buildFields(item){
+    const d = item || { nom:'', rol:'', contacte:'', estat:ESTATS[0], data:'', notes:'' };
+    return `
+      <div class="field"><label>Nom</label><input type="text" id="con-fNom" required value="${d.nom||''}"></div>
+      <div class="field-row">
+        <div class="field"><label>Equip / rol</label><input type="text" id="con-fRol" value="${d.rol||''}"></div>
+        <div class="field"><label>Contacte</label><input type="text" id="con-fContacte" value="${d.contacte||''}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Estat</label><select id="con-fEstat">${ESTATS.map(s=>`<option ${d.estat===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Data prevista</label><input type="date" id="con-fData" value="${d.data||''}"></div>
+      </div>
+      <div class="field"><label>Notes</label><textarea id="con-fNotes" rows="2">${d.notes||''}</textarea></div>
+    `;
+  }
+  function readForm(){
+    const nom = document.getElementById('con-fNom').value.trim();
+    if (!nom) { alert('Falta el nom.'); return null; }
+    return { nom, rol:document.getElementById('con-fRol').value.trim(), contacte:document.getElementById('con-fContacte').value.trim(), estat:document.getElementById('con-fEstat').value, data:document.getElementById('con-fData').value, notes:document.getElementById('con-fNotes').value.trim() };
+  }
+  document.getElementById('con-btnAdd').onclick = () => openModal('convidats', null);
+  moduleHandlers.convidats = { collection:'convidats_items', newTitle:'Nou convidat', editTitle:'Edita convidat', buildFields, readForm };
+  window.__conSetData = (d) => { data = d; render(); };
+})();
+
+/* ================= BOTIGA ================= */
+(function(){
+  const CATS=['Samarretes','Altres merch','Digital','Altres'];
+  const PLATAFORMES=['Per decidir','Fourthwall','Spreadshop','Pròpia'];
+  const ESTATS=['Idea','En producció','A la venda','Descatalogat'];
+  let data=[]; let filters={categoria:'Tots',estat:'Tots',search:''};
+  function estatTag(e){ return {'Idea':'grey','En producció':'amber','A la venda':'green','Descatalogat':'red'}[e]||'grey'; }
+  document.getElementById('bot-catFilter').innerHTML += CATS.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('bot-estatFilter').innerHTML += ESTATS.map(s=>`<option>${s}</option>`).join('');
+  document.getElementById('bot-catFilter').addEventListener('change', e=>{filters.categoria=e.target.value; render();});
+  document.getElementById('bot-estatFilter').addEventListener('change', e=>{filters.estat=e.target.value; render();});
+  document.getElementById('bot-search').addEventListener('input', e=>{filters.search=e.target.value; render();});
+
+  function render(){
+    const filtered = data.filter(x=>filters.categoria==='Tots'||x.categoria===filters.categoria)
+      .filter(x=>filters.estat==='Tots'||x.estat===filters.estat)
+      .filter(x=>!filters.search.trim()||(x.nom+' '+(x.notes||'')).toLowerCase().includes(filters.search.toLowerCase()))
+      .sort((a,b)=>(b.creat||0)-(a.creat||0));
+    const list=document.getElementById('bot-list');
+    list.innerHTML = filtered.length===0? `<div class="empty">Cap producte amb aquests filtres.</div>` : filtered.map(x=>{
+      const marge=(x.preu||0)-(x.cost||0);
+      return `<div class="row" data-id="${x.id}"><div><div class="desc">${x.nom}</div>
+        <div class="meta"><span class="tag navy">${x.categoria}</span><span>${x.plataforma}</span>${x.preu?`<span>&middot;</span><span>${fmtMoney(x.preu)}</span>`:''}</div></div>
+      <div class="right"><div>${x.preu?`<div class="amount mono" style="color:${marge>=0?'var(--green)':'var(--red)'}">${marge>=0?'+':''}${fmtMoney(marge)}</div>`:''}<span class="tag ${estatTag(x.estat)}">${x.estat}</span></div><button class="del" data-del="${x.id}">&#10005;</button></div></div>`;
+    }).join('');
+    list.querySelectorAll('.row').forEach(r=>r.addEventListener('click', e=>{ if(e.target.closest('.del'))return; openModal('botiga', data.find(m=>m.id===r.dataset.id)); }));
+    list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); removeDirect('botiga', b.dataset.del); }));
+    renderKPIs(); renderBars(); renderByCat();
+  }
+  function renderKPIs(){
+    document.getElementById('bot-kpiVenda').textContent = data.filter(x=>x.estat==='A la venda').length;
+    document.getElementById('bot-kpiProduccio').textContent = data.filter(x=>x.estat==='En producció').length;
+    const actius = data.filter(x=>x.estat==='A la venda'&&x.preu);
+    const margeMitja = actius.length? actius.reduce((s,x)=>s+(x.preu-(x.cost||0)),0)/actius.length : 0;
+    document.getElementById('bot-kpiMarge').innerHTML = fmtMoney(margeMitja);
+    document.getElementById('bot-kpiTotal').textContent = data.length;
+  }
+  function renderBars(){
+    const sums={}; data.forEach(x=>{sums[x.plataforma]=(sums[x.plataforma]||0)+1;});
+    const max=Math.max(1,...Object.values(sums)); const entries=Object.entries(sums);
+    document.getElementById('bot-bars').innerHTML = entries.length? entries.sort((a,b)=>b[1]-a[1]).map(([p,v])=>`<div class="bar-item"><div class="bi-top"><span>${p}</span><span class="amt">${v}</span></div><div class="bar-track"><div class="bar-fill" style="width:${(v/max*100).toFixed(0)}%; background:var(--navy);"></div></div></div>`).join('') : `<div class="empty" style="padding:10px 0;">Sense dades.</div>`;
+  }
+  function renderByCat(){
+    const sums={}; data.forEach(x=>{sums[x.categoria]=(sums[x.categoria]||0)+1;});
+    const entries=Object.entries(sums);
+    document.getElementById('bot-byCat').innerHTML = entries.length? entries.map(([c,v])=>`<div class="payer-row"><span>${c}</span><span class="pill" style="background:var(--navy-dim); color:var(--navy);">${v}</span></div>`).join('') : `<div class="empty" style="padding:10px 0;">Sense dades.</div>`;
+  }
+  function buildFields(item){
+    const d = item || { nom:'', categoria:CATS[0], plataforma:PLATAFORMES[0], preu:'', cost:'', estat:ESTATS[0], enllac:'', notes:'' };
+    return `
+      <div class="field"><label>Producte</label><input type="text" id="bot-fNom" required value="${d.nom||''}"></div>
+      <div class="field-row">
+        <div class="field"><label>Categoria</label><select id="bot-fCategoria">${CATS.map(c=>`<option ${d.categoria===c?'selected':''}>${c}</option>`).join('')}</select></div>
+        <div class="field"><label>Plataforma</label><select id="bot-fPlataforma">${PLATAFORMES.map(p=>`<option ${d.plataforma===p?'selected':''}>${p}</option>`).join('')}</select></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Preu de venda (€)</label><input type="text" id="bot-fPreu" inputmode="decimal" value="${item?item.preu:''}"></div>
+        <div class="field"><label>Cost per unitat (€)</label><input type="text" id="bot-fCost" inputmode="decimal" value="${item?item.cost:''}"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Estat</label><select id="bot-fEstat">${ESTATS.map(s=>`<option ${d.estat===s?'selected':''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Enllaç</label><input type="text" id="bot-fEnllac" value="${d.enllac||''}"></div>
+      </div>
+      <div class="field"><label>Notes</label><textarea id="bot-fNotes" rows="2">${d.notes||''}</textarea></div>
+    `;
+  }
+  function readForm(){
+    const nom = document.getElementById('bot-fNom').value.trim();
+    if (!nom) { alert('Falta el nom del producte.'); return null; }
+    return {
+      nom, categoria:document.getElementById('bot-fCategoria').value, plataforma:document.getElementById('bot-fPlataforma').value,
+      preu: parseFloat(String(document.getElementById('bot-fPreu').value).replace(',','.'))||0,
+      cost: parseFloat(String(document.getElementById('bot-fCost').value).replace(',','.'))||0,
+      estat:document.getElementById('bot-fEstat').value, enllac:document.getElementById('bot-fEnllac').value.trim(), notes:document.getElementById('bot-fNotes').value.trim()
+    };
+  }
+  document.getElementById('bot-btnAdd').onclick = () => openModal('botiga', null);
+  moduleHandlers.botiga = { collection:'botiga_items', newTitle:'Nou producte', editTitle:'Edita producte', buildFields, readForm };
+  window.__botSetData = (d) => { data = d; render(); };
+})();
+
+/* ================= DASHBOARD (Inici) ================= */
+const store = { finances:[], calendari:[], xarxes:[], guions:[], materials:[], convidats:[], botiga:[] };
+const DASH_ICONS = {
+  finances: `<path d="M17 7a6.2 6.2 0 100 10"/><path d="M4 10.3h9M4 13.7h7"/>`,
+  calendari: `<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>`,
+  xarxes: `<path d="M3 10.5v3a2 2 0 002 2h1l3 4.5v-16L6 8.5H5a2 2 0 00-2 2z"/><path d="M13.5 8a4.3 4.3 0 010 8"/>`,
+  guions: `<path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6M9 13.5h6M9 17.5h6"/>`,
+  materials: `<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-4 4-3-3-5 5"/>`,
+  convidats: `<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/>`,
+  botiga: `<path d="M6 8h12l1 13H5z"/><path d="M9 8V6a3 3 0 016 0v2"/>`,
+};
+function dashCard(key, label, value, colorVar, colorDimVar){
+  return `<a class="dash-card" href="javascript:void(0)" data-sec="${key}">
+    <div class="dc-top"><div class="dc-icon" style="background:${colorDimVar}; color:${colorVar};"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${DASH_ICONS[key]}</svg></div></div>
+    <div class="dc-label">${label}</div><div class="dc-value">${value}</div>
+  </a>`;
+}
+function renderDashboard(){
+  greet();
+  const today = todayISO();
+  const finPendCount = store.finances.filter(x=>x.estat==='Pendent').length;
+  const finBal = (() => { const ing={},desp={}; store.finances.forEach(x=>{ const m=x.tipus==='ingres'?ing:desp; m[x.moneda]=(m[x.moneda]||0)+x.import; }); const eur=(ing.EUR||0)-(desp.EUR||0); return fmtMoney(eur,'EUR'); })();
+  const propersProgrames = store.calendari.filter(x=>x.tipus==='programa'&&x.data>=today).length;
+  const acredPendents = store.calendari.filter(x=>x.tipus==='acreditacio'&&x.estat==="Pendent d'enviar").length;
+  const xarProgramats = store.xarxes.filter(x=>x.estat==='Programat'&&x.data>=today).length;
+  const guiRevisio = store.guions.filter(x=>x.estat==='Revisió'||x.estat==='Esborrany').length;
+  const conPerConfirmar = store.convidats.filter(x=>x.estat==='Per contactar'||x.estat==='Contactat').length;
+  const botVenda = store.botiga.filter(x=>x.estat==='A la venda').length;
+
+  document.getElementById('dashGrid').innerHTML = [
+    dashCard('finances','Balanç net', finBal, 'var(--navy)', 'var(--navy-dim)'),
+    dashCard('calendari','Propers programes', propersProgrames, 'var(--navy)', 'var(--navy-dim)'),
+    dashCard('calendari','Acreditacions pendents', acredPendents, 'var(--gold)', 'var(--gold-dim)'),
+    dashCard('xarxes','Programats', xarProgramats, 'var(--navy)', 'var(--navy-dim)'),
+    dashCard('guions','Guions per tancar', guiRevisio, 'var(--gold)', 'var(--gold-dim)'),
+    dashCard('convidats','Convidats per confirmar', conPerConfirmar, 'var(--grey)', 'var(--grey-dim)'),
+    dashCard('botiga','Productes a la venda', botVenda, 'var(--green)', 'var(--green-dim)'),
+    dashCard('finances','Pendent de tancar', finPendCount, 'var(--red)', 'var(--red-dim)'),
+  ].join('');
+  document.querySelectorAll('.dash-card').forEach(c => c.addEventListener('click', () => showSection(c.dataset.sec)));
+
+  const upcoming = [
+    ...store.calendari.filter(x=>x.data>=today).map(x=>({ titol:x.titol, data:x.data, mod:x.tipus==='programa'?'Programa':'Acreditació', color:x.tipus==='programa'?'var(--navy)':'var(--gold)' })),
+    ...store.xarxes.filter(x=>x.estat==='Programat'&&x.data>=today).map(x=>({ titol:x.titol, data:x.data, mod:'Xarxes', color:'var(--green)' })),
+    ...store.convidats.filter(x=>(x.estat==='Confirmat'||x.estat==='Gravat')&&x.data&&x.data>=today).map(x=>({ titol:x.nom, data:x.data, mod:'Convidat', color:'var(--grey)' })),
+  ].filter(x=>daysUntil(x.data)<=30).sort((a,b)=>a.data.localeCompare(b.data)).slice(0,10);
+  document.getElementById('dashUpcoming').innerHTML = upcoming.length? upcoming.map(x=>`<div class="deadline-row"><span><span class="dot" style="background:${x.color}"></span>${x.titol} <span style="color:var(--text3)">· ${x.mod}</span></span><span class="mono" style="color:var(--text2)">${fmtDate(x.data)}</span></div>`).join('') : `<div class="empty" style="padding:10px 0;">Res en els propers 30 dies.</div>`;
+
+  const dl = store.calendari.filter(x=>x.tipus==='acreditacio'&&x.estat!=='Aprovada'&&x.estat!=='Denegada').sort((a,b)=>a.data.localeCompare(b.data));
+  document.getElementById('dashDeadlines').innerHTML = dl.length? dl.map(x=>{ const d=daysUntil(x.data); const color=d<0?'var(--red)':d<=7?'var(--red)':d<=21?'var(--gold)':'var(--grey)'; return `<div class="deadline-row"><span><span class="dot" style="background:${color}"></span>${x.titol}</span><span class="mono" style="color:${color}">${d<0?'vençut':d+'d'}</span></div>`; }).join('') : `<div class="empty" style="padding:10px 0;">Cap termini obert.</div>`;
+}
+renderDashboard();
+
+/* ================= FIREBASE WIRING ================= */
+let db;
+function listenTo(collectionName, orderField, setFn, storeKey){
+  onSnapshot(query(collection(db, collectionName), orderBy(orderField)), (snap) => {
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    store[storeKey] = items;
+    setFn(items);
+    renderDashboard();
+  }, (err) => {
+    document.getElementById('setupBanner').style.display = 'block';
+    document.getElementById('setupBanner').innerHTML = '<strong>Error de connexió:</strong> ' + err.message;
+  });
+}
+
+if (!CONFIGURED) {
+  document.getElementById('setupBanner').style.display = 'block';
+} else {
+  const app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  listenTo('moviments', 'data', window.__finSetData, 'finances');
+  listenTo('calendari_items', 'data', window.__calSetData, 'calendari');
+  listenTo('xarxes_items', 'data', window.__xarSetData, 'xarxes');
+  listenTo('guions_items', 'data', window.__guiSetData, 'guions');
+  listenTo('materials_items', 'creat', window.__matSetData, 'materials');
+  listenTo('convidats_items', 'creat', window.__conSetData, 'convidats');
+  listenTo('botiga_items', 'creat', window.__botSetData, 'botiga');
+}
+</script>
+</body>
+</html>
